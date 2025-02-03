@@ -1,7 +1,11 @@
 
+using ProductManagement.App.Services;
+using ProductManagement.Core.Interfaces;
+using ProductManagement.Infra.Repositories;
+
 namespace ProductManagement.API
 {
-    public class Program
+    internal sealed class Program
     {
         public static void Main(string[] args)
         {
@@ -13,6 +17,9 @@ namespace ProductManagement.API
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi(); // Document name is v1
             builder.Services.AddOpenApi("internal"); // Document name is internal
+
+            builder.Services.AddScoped<IProductRepo, ProductRepo>(); // Register IProductRepo with its implementation
+            builder.Services.AddScoped<ProductService>(); // Register ProductService
 
             var app = builder.Build();
 

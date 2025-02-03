@@ -1,35 +1,43 @@
 using Microsoft.AspNetCore.Mvc;
+using ProductManagement.App.Services;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ProductManagement.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ProductsController : ControllerBase
+    public sealed class ProductsController : ControllerBase
     {
-        private static readonly string[] Fruits = new[]
-        {
-            "Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew", "Kiwi", "Lemon"
-        };
-
+        private readonly ProductService _productService;
         private readonly ILogger<ProductsController> _logger;
 
-        public ProductsController(ILogger<ProductsController> logger)
+        public ProductsController(ProductService productService, ILogger<ProductsController> logger)
         {
+            _productService = productService;
             _logger = logger;
-            _logger.LogInformation("something");
+            _logger.LogInformation("Instantiated {ControllerName}", nameof(ProductsController));
         }
 
         [HttpGet(Name = "GetProducts")]
-        public IEnumerable<DTOs.Product> Get()
+        public IActionResult Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new DTOs.Product
+            _logger.LogInformation("Invoked {MethodName}", nameof(Get));
+            var products = _productService.GetAllProducts();
+            return Ok(products);
+        }
+
+        [HttpGet("{id}", Name = "GetProductById")]
+        public IActionResult GetProductById(int id)
+        {
+            _logger.LogInformation("Invoked {MethodName} with ID: {Id}", nameof(GetProductById), id);
+            var product = _productService.GetProductById(id);
+
+            if (product == null)
             {
-                Id = index,
-                Name = $"Product {index}",
-                Price = Random.Shared.Next(1, 1000),
-                Description = Fruits[Random.Shared.Next(Fruits.Length)]
-            })
-            .ToArray();
+                return NotFound();
+            }
+
+            return Ok(product);
         }
     }
 }

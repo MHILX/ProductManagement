@@ -9,7 +9,7 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5229"
-    },
+    }
     //"https": {
     //  "commandName": "Project",
     //  "environmentVariables": {
