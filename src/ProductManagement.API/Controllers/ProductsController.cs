@@ -4,6 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProductManagement.API.Controllers
 {
+    /// <summary>
+    /// Controller for managing products.
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public sealed class ProductsController : ControllerBase
@@ -11,6 +14,11 @@ namespace ProductManagement.API.Controllers
         private readonly ProductService _productService;
         private readonly ILogger<ProductsController> _logger;
 
+        /// <summary>
+        /// Constructor for ProductsController.
+        /// </summary>
+        /// <param name="productService"></param>
+        /// <param name="logger"></param>
         public ProductsController(ProductService productService, ILogger<ProductsController> logger)
         {
             _productService = productService;
@@ -18,6 +26,10 @@ namespace ProductManagement.API.Controllers
             _logger.LogInformation("Instantiated {ControllerName}", nameof(ProductsController));
         }
 
+        /// <summary>
+        /// Get all products.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet(Name = "GetProducts")]
         public IActionResult Get()
         {
@@ -26,6 +38,11 @@ namespace ProductManagement.API.Controllers
             return Ok(products);
         }
 
+        /// <summary>
+        /// Get product by ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}", Name = "GetProductById")]
         public IActionResult GetProductById(int id)
         {

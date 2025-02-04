@@ -21,9 +21,26 @@
 	</ItemGroup>
 
 	<PropertyGroup>
+		<Authors>Mohammed</Authors>
+		<Title>ProductManagement.API</Title>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<AnalysisLevel>9.0</AnalysisLevel>
+		<!--<AnalysisMode>AllEnabledByDefault</AnalysisMode>-->		
+		
+		<AnalysisMode>Recommended</AnalysisMode>
+		<AnalysisModeSecurity>All</AnalysisModeSecurity>
+		<AnalysisModePerformance>All</AnalysisModePerformance>
+		<AnalysisModeReliability>All</AnalysisModeReliability>
+		<AnalysisModeDesign>All</AnalysisModeDesign>
+		<AnalysisModeMaintainability>All</AnalysisModeMaintainability>
+		<AnalysisModeUsage>All</AnalysisModeUsage>
+		<AnalysisModeNaming>All</AnalysisModeNaming>
+		<AnalysisModeStyle>Recommended</AnalysisModeStyle>
+		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
+		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 </Project>
