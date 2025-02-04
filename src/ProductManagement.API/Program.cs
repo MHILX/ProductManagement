@@ -5,7 +5,7 @@ using ProductManagement.Infra.Repositories;
 
 namespace ProductManagement.API
 {
-    internal sealed class Program
+    public sealed partial class Program
     {
         public static void Main(string[] args)
         {
