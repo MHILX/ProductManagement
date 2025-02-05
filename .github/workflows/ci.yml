@@ -64,8 +64,12 @@ jobs:
 
     - name: Parse coverage report
       id: coverage
-      run: |
-        COVERAGE_FILE=$(find ./TestResults -name "*.coverage.json")
+      run: |       
+        COVERAGE_FILE=$(find ./TestResults -type f -name "*.coverage.json")
+        if [ $? -ne 0 ]; then
+          echo "Coverage files not found."
+          exit 1
+        fi
         COVERAGE_PERCENTAGE=$(cat $COVERAGE_FILE | jq '.[] | select(.name == "Line") | .coveredpercent')
         echo "Coverage Percentage: $COVERAGE_PERCENTAGE"
         echo "COVERAGE_PERCENTAGE=$COVERAGE_PERCENTAGE" >> $GITHUB_ENV
