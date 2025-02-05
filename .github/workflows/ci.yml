@@ -39,8 +39,8 @@ jobs:
     - name: Run tests with coverage
       run: |
         sudo apt-get update
-        sudo apt-get install -y jq
-        dotnet test ${{ env.SOLUTION_FILE }} --no-restore --verbosity normal --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test_results.trx"
+        sudo apt-get install -y jq        
+        dotnet test ${{ env.SOLUTION_FILE }} --no-restore --verbosity normal --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
@@ -59,14 +59,11 @@ jobs:
         path: '**/test_results.trx'
         reporter: dotnet-trx
 
-    # - name: Test and generate coverage report
-    #   run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"
-
     - name: Parse coverage report
       id: coverage
       run: |       
-        COVERAGE_FILE=$(find ./TestResults -type f -name "*.coverage.json")
-        if [ $? -ne 0 ]; then
+        COVERAGE_FILE=$(find ./TestResults -type f -name "*.coverage.cobertura.xml")
+        if [ -z "$COVERAGE_FILE" ]; then
           echo "Coverage files not found."
           exit 1
         fi
