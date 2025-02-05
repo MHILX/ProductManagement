@@ -27,12 +27,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
 
-    - name: Build
-      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
-      env:
-        DOTNET_CLI_TELEMETRY_OPTOUT: 1
-
-    - name: Run static code analysis
+    - name: Build and Run static code analysis
       run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore -warnaserror
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
