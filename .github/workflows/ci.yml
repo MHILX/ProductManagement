@@ -36,8 +36,11 @@ jobs:
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
-    - name: Run tests
-      run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --verbosity normal --logger "trx;LogFileName=test_results.trx"
+    - name: Run tests with coverage
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq
+        dotnet test ${{ env.SOLUTION_FILE }} --no-restore --verbosity normal --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test_results.trx"
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
@@ -55,3 +58,20 @@ jobs:
         name: Test Results
         path: '**/test_results.trx'
         reporter: dotnet-trx
+
+    # - name: Test and generate coverage report
+    #   run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"
+
+    - name: Parse coverage report
+      id: coverage
+      run: |
+        COVERAGE_FILE=$(find ./TestResults -name "*.coverage.json")
+        COVERAGE_PERCENTAGE=$(cat $COVERAGE_FILE | jq '.[] | select(.name == "Line") | .coveredpercent')
+        echo "Coverage Percentage: $COVERAGE_PERCENTAGE"
+        echo "COVERAGE_PERCENTAGE=$COVERAGE_PERCENTAGE" >> $GITHUB_ENV
+
+    - name: Fail if coverage is below 50%
+      if: ${{ env.COVERAGE_PERCENTAGE }} < 50
+      run: |
+        echo "Code coverage is below 50%. Failing the workflow."
+        exit 1
