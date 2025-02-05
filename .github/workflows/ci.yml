@@ -33,6 +33,13 @@ jobs:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
     - name: Run tests
-      run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --verbosity normal
+      run: dotnet test ${{ env.SOLUTION_FILE }} --no-restore --verbosity normal --logger "trx;LogFileName=test_results.trx"
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+    - name: Publish test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: Test Results
+        path: '**/test_results.trx'
