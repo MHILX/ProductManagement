@@ -26,6 +26,8 @@
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 		<AnalysisLevel>9.0</AnalysisLevel>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<!--<AnalysisMode>AllEnabledByDefault</AnalysisMode>-->		
 		
 		<AnalysisMode>Recommended</AnalysisMode>
@@ -38,9 +40,7 @@
 		<AnalysisModeNaming>All</AnalysisModeNaming>
 		<AnalysisModeStyle>Recommended</AnalysisModeStyle>
 		<AnalysisModeSingleFile>All</AnalysisModeSingleFile>
-		<AnalysisModeDocumentation>All</AnalysisModeDocumentation>
-		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<AnalysisModeDocumentation>Recommended</AnalysisModeDocumentation>		
 	</PropertyGroup>
 
 </Project>
