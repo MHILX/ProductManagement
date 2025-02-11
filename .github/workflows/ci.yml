@@ -59,10 +59,24 @@ jobs:
         path: '**/test_results.trx'
         reporter: dotnet-trx
 
+    - name: Install coverlet and reportgenerator
+      run: |
+        dotnet tool install --global coverlet.console
+        dotnet tool install --global dotnet-reportgenerator-globaltool
+      env:
+        PATH: ${{ runner.tool_cache }}/.dotnet/tools:$PATH
+
+    - name: Generate coverage report
+      run: |
+        coverlet ./src/ProductManagement.Tests/bin/Release/netcoreapp3.1/ProductManagement.Tests.dll --target "dotnet" --targetargs "test --no-build --no-restore -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura" --output ./TestResults/coverage.cobertura.xml
+        reportgenerator -reports:./TestResults/coverage.cobertura.xml -targetdir:coveragereport
+      env:
+        PATH: ${{ runner.tool_cache }}/.dotnet/tools:$PATH
+
     - name: Parse coverage report
       id: coverage
       run: |       
-        COVERAGE_FILE=$(find ./TestResults -type f -name "*.coverage.cobertura.xml")
+        COVERAGE_FILE=./TestResults/coverage.cobertura.xml
         if [ -z "$COVERAGE_FILE" ]; then
           echo "Coverage files not found."
           exit 1
