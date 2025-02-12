@@ -47,12 +47,15 @@ jobs:
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1      
 
+    - name: List test results directory
+      run: ls -R ./TestResults
+
     - name: Upload coverage report
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: Test Results
-        path: ./TestResults/**/coverage.cobertura.xml 
+        path: ./TestResults/**/*.cobertura.xml 
 
     - name: Display coverage summary
       run: |
