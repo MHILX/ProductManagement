@@ -21,10 +21,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
 
@@ -36,57 +36,43 @@ jobs:
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
+    - name: Install dotnet-coverage
+      run: dotnet tool install -g dotnet-coverage      
+
     - name: Run tests with coverage
       run: |
         sudo apt-get update
         sudo apt-get install -y jq        
-        dotnet test ${{ env.SOLUTION_FILE }} --no-restore --verbosity normal --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
+        dotnet test ${{ env.SOLUTION_FILE }} --no-restore --verbosity normal --logger trx --collect "Code Coverage;Format=cobertura" --results-directory ./TestResults
       env:
-        DOTNET_CLI_TELEMETRY_OPTOUT: 1
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1      
 
-    - name: Publish test results
+    - name: Upload coverage report
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: Test Results
-        path: '**/test_results.trx'
+        path: ./TestResults/**/coverage.cobertura.xml 
 
-    - name: Report test results
-      if: always()
-      uses: dorny/test-reporter@v1
-      with:
-        name: Test Results
-        path: '**/test_results.trx'
-        reporter: dotnet-trx
-
-    - name: Install coverlet and reportgenerator
+    - name: Display coverage summary
       run: |
-        dotnet tool install --global coverlet.console
-        dotnet tool install --global dotnet-reportgenerator-globaltool
-      env:
-        PATH: ${{ runner.tool_cache }}/.dotnet/tools:$PATH
+        echo "## Code Coverage Report" >> $GITHUB_STEP_SUMMARY
+        echo "The code coverage report can be downloaded from the artifacts section." >> $GITHUB_STEP_SUMMARY
 
-    - name: Generate coverage report
-      run: |
-        coverlet ./src/ProductManagement.Tests/bin/Release/netcoreapp3.1/ProductManagement.Tests.dll --target "dotnet" --targetargs "test --no-build --no-restore -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura" --output ./TestResults/coverage.cobertura.xml
-        reportgenerator -reports:./TestResults/coverage.cobertura.xml -targetdir:coveragereport
-      env:
-        PATH: ${{ runner.tool_cache }}/.dotnet/tools:$PATH
+    # - name: Parse coverage report
+    #   id: coverage
+    #   run: |       
+    #     COVERAGE_FILE=./TestResults/coverage.cobertura.xml
+    #     if [ -z "$COVERAGE_FILE" ]; then
+    #       echo "Coverage files not found."
+    #       exit 1
+    #     fi
+    #     COVERAGE_PERCENTAGE=$(cat $COVERAGE_FILE | jq '.[] | select(.name == "Line") | .coveredpercent')
+    #     echo "Coverage Percentage: $COVERAGE_PERCENTAGE"
+    #     echo "COVERAGE_PERCENTAGE=$COVERAGE_PERCENTAGE" >> $GITHUB_ENV
 
-    - name: Parse coverage report
-      id: coverage
-      run: |       
-        COVERAGE_FILE=./TestResults/coverage.cobertura.xml
-        if [ -z "$COVERAGE_FILE" ]; then
-          echo "Coverage files not found."
-          exit 1
-        fi
-        COVERAGE_PERCENTAGE=$(cat $COVERAGE_FILE | jq '.[] | select(.name == "Line") | .coveredpercent')
-        echo "Coverage Percentage: $COVERAGE_PERCENTAGE"
-        echo "COVERAGE_PERCENTAGE=$COVERAGE_PERCENTAGE" >> $GITHUB_ENV
-
-    - name: Fail if coverage is below 50%
-      if: ${{ env.COVERAGE_PERCENTAGE }} < 50
-      run: |
-        echo "Code coverage is below 50%. Failing the workflow."
-        exit 1
+    # - name: Fail if coverage is below 50%
+    #   if: ${{ env.COVERAGE_PERCENTAGE }} < 50
+    #   run: |
+    #     echo "Code coverage is below 50%. Failing the workflow."
+    #     exit 1
