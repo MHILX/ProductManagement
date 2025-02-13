@@ -101,8 +101,7 @@ jobs:
         echo "Executed tests: $executed_tests" >> $GITHUB_STEP_SUMMARY
         echo "Passed tests: $passed_tests" >> $GITHUB_STEP_SUMMARY
         echo "Failed tests: $failed_tests" >> $GITHUB_STEP_SUMMARY
-        echo "Coverage: $coverage%" >> $GITHUB_STEP_SUMMARY
-        echo "The detailed test results can be viewed in the Checks tab." >> $GITHUB_STEP_SUMMARY
+        echo "Coverage: $coverage%" >> $GITHUB_STEP_SUMMARY        
 
   deploy-dev:
     name: Deploy to Development
