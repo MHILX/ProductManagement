@@ -90,7 +90,8 @@ jobs:
           exit 1
         else
           echo "Coverage is above 50%: $coverage%"
-        fi        
+        fi
+        echo "::set-output name=coverage::$coverage"      
 
     - name: Display test summary
       if: success()
