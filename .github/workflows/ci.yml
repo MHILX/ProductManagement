@@ -96,7 +96,7 @@ jobs:
     - name: Display test summary
       if: success()
       run: |
-        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## Test Results Summary :rocket:" >> $GITHUB_STEP_SUMMARY
         total_tests=$(grep -oP '<Counters.*?total="\K\d+' ./TestResults/*.trx)
         executed_tests=$(grep -oP '<Counters.*?executed="\K\d+' ./TestResults/*.trx)
         passed_tests=$(grep -oP '<Counters.*?passed="\K\d+' ./TestResults/*.trx)
