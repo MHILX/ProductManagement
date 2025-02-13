@@ -33,20 +33,20 @@ jobs:
       run: dotnet restore ${{ env.SOLUTION_FILE }}
 
     - name: Build and Run static code analysis
-      continue-on-error: true
+      continue-on-error: false
       run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore -warnaserror
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
-    - name: Display build errors or warnings
-      if: failure() && steps.build.outcome == 'failure'
-      run: |
-        echo "## Build Errors or Warnings" >> $GITHUB_STEP_SUMMARY
-        echo "The build process encountered errors or warnings. Please check the logs below for details." >> $GITHUB_STEP_SUMMARY
-        echo "```" >> \$GITHUB_STEP_SUMMARY
-        cat build_output.txt >> \$GITHUB_STEP_SUMMARY
-        echo "```" >> $GITHUB_STEP_SUMMARY
-        exit 1
+    # - name: Display build errors or warnings
+    #   if: failure() && steps.build.outcome == 'failure'
+    #   run: |
+    #     echo "## Build Errors or Warnings" >> $GITHUB_STEP_SUMMARY
+    #     echo "The build process encountered errors or warnings. Please check the logs below for details." >> $GITHUB_STEP_SUMMARY
+    #     echo "```" >> \$GITHUB_STEP_SUMMARY
+    #     cat build_output.txt >> \$GITHUB_STEP_SUMMARY
+    #     echo "```" >> $GITHUB_STEP_SUMMARY
+    #     exit 1
 
     - name: Run tests with coverage
       run: |
@@ -63,32 +63,36 @@ jobs:
     #   run: cat ./TestResults/*.trx
 
     - name: Publish Test Results
-      uses: dorny/test-reporter@v1
-      if: always()
+      if: success()
+      uses: dorny/test-reporter@v1      
       with:
         name: Test Results
         path: ./TestResults/*.trx
         reporter: dotnet-trx
 
     - name: Upload coverage report
-      if: always()
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: Coverage Report
         path: ./TestResults/**/*.cobertura.xml    
 
     - name: Install ReportGenerator
+      if: success()
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
   
     - name: Generate coverage report
+      if: success()
       run: reportgenerator -reports:./TestResults/**/*.cobertura.xml -targetdir:./TestResults/coverage -reporttypes:TextSummary
 
     - name: Display coverage summary
+      if: success()
       run: |
         echo "## Code Coverage Report" >> $GITHUB_STEP_SUMMARY
         echo "The code coverage report can be downloaded from the artifacts section." >> $GITHUB_STEP_SUMMARY
 
     - name: Parse coverage report
+      if: success()
       id: coverage
       run: |       
         coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
@@ -101,6 +105,7 @@ jobs:
         echo "coverage=$coverage" >> $GITHUB_OUTPUT
 
     - name: Display test summary
+      if: success()
       run: |
         echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
         total_tests=$(grep -oP '<Counters.*?total="\K\d+' ./TestResults/*.trx)
