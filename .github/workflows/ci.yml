@@ -91,7 +91,7 @@ jobs:
         else
           echo "Coverage is above 50%: $coverage%"
         fi
-        echo "::set-output name=coverage::$coverage"      
+        echo "coverage=$coverage" >> $GITHUB_OUTPUT     
 
     - name: Display test summary
       if: success()
@@ -100,8 +100,8 @@ jobs:
         total_tests=$(grep -oP '<Counters.*?total="\K\d+' ./TestResults/*.trx)
         executed_tests=$(grep -oP '<Counters.*?executed="\K\d+' ./TestResults/*.trx)
         passed_tests=$(grep -oP '<Counters.*?passed="\K\d+' ./TestResults/*.trx)
-        failed_tests=$(grep -oP '<Counters.*?failed="\K\d+' ./TestResults/*.trx)
-        coverage=${{ steps.coverage.outputs.coverage }}
+        failed_tests=$(grep -oP '<Counters.*?failed="\K\d+' ./TestResults/*.trx)        
+        coverage=$(cat $GITHUB_OUTPUT | grep "coverage=" | awk -F'=' '{print $2}')
         echo "Total tests: $total_tests" >> $GITHUB_STEP_SUMMARY
         echo "Executed tests: $executed_tests" >> $GITHUB_STEP_SUMMARY
         echo "Passed tests: $passed_tests" >> $GITHUB_STEP_SUMMARY
