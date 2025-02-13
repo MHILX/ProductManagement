@@ -90,8 +90,7 @@ jobs:
           exit 1
         else
           echo "Coverage is above 50%: $coverage%"
-        fi
-        echo "coverage=$coverage" >> $GITHUB_OUTPUT
+        fi        
 
     - name: Display test summary
       if: success()
