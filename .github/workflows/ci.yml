@@ -64,20 +64,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Coverage Report
-        path: ./TestResults/**/*.cobertura.xml
-
-    - name: Display test summary
-      run: |
-        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
-        total_tests=$(grep -oP '<Counters.*?total="\K\d+' ./TestResults/*.trx)
-        executed_tests=$(grep -oP '<Counters.*?executed="\K\d+' ./TestResults/*.trx)
-        passed_tests=$(grep -oP '<Counters.*?passed="\K\d+' ./TestResults/*.trx)
-        failed_tests=$(grep -oP '<Counters.*?failed="\K\d+' ./TestResults/*.trx)
-        echo "Total tests: $total_tests" >> $GITHUB_STEP_SUMMARY
-        echo "Executed tests: $executed_tests" >> $GITHUB_STEP_SUMMARY
-        echo "Passed tests: $passed_tests" >> $GITHUB_STEP_SUMMARY
-        echo "Failed tests: $failed_tests" >> $GITHUB_STEP_SUMMARY
-        echo "The detailed test results can be viewed in the Checks tab." >> $GITHUB_STEP_SUMMARY
+        path: ./TestResults/**/*.cobertura.xml    
 
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -99,7 +86,23 @@ jobs:
           exit 1
         else
           echo "Coverage is above 50%: $coverage%"
-        fi    
+        fi
+        echo "coverage=$coverage" >> $GITHUB_OUTPUT
+
+    - name: Display test summary
+      run: |
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        total_tests=$(grep -oP '<Counters.*?total="\K\d+' ./TestResults/*.trx)
+        executed_tests=$(grep -oP '<Counters.*?executed="\K\d+' ./TestResults/*.trx)
+        passed_tests=$(grep -oP '<Counters.*?passed="\K\d+' ./TestResults/*.trx)
+        failed_tests=$(grep -oP '<Counters.*?failed="\K\d+' ./TestResults/*.trx)
+        coverage=${{ steps.coverage.outputs.coverage }}
+        echo "Total tests: $total_tests" >> $GITHUB_STEP_SUMMARY
+        echo "Executed tests: $executed_tests" >> $GITHUB_STEP_SUMMARY
+        echo "Passed tests: $passed_tests" >> $GITHUB_STEP_SUMMARY
+        echo "Failed tests: $failed_tests" >> $GITHUB_STEP_SUMMARY
+        echo "Coverage: $coverage%" >> $GITHUB_STEP_SUMMARY
+        echo "The detailed test results can be viewed in the Checks tab." >> $GITHUB_STEP_SUMMARY
 
   deploy-dev:
     name: Deploy to Development
