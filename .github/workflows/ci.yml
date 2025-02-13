@@ -48,8 +48,8 @@ jobs:
     - name: List test results directory
       run: ls -R ./TestResults    
 
-    - name: Inspect TRX file structure
-      run: cat ./TestResults/*.trx
+    # - name: Inspect TRX file structure
+    #   run: cat ./TestResults/*.trx
 
     - name: Publish Test Results
       uses: dorny/test-reporter@v1
@@ -69,10 +69,12 @@ jobs:
     - name: Display test summary
       run: |
         echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
-        total_tests=$(grep -oP '<counter><Total>\K.*(?=</Total>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')
-        passed_tests=$(grep -oP '<counter><Passed>\K.*(?=</Passed>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')
-        failed_tests=$(grep -oP '<counter><Failed>\K.*(?=</Failed>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')
+        total_tests=$(grep -oP '<Counters.*?total="\K\d+' ./TestResults/*.trx)
+        executed_tests=$(grep -oP '<Counters.*?executed="\K\d+' ./TestResults/*.trx)
+        passed_tests=$(grep -oP '<Counters.*?passed="\K\d+' ./TestResults/*.trx)
+        failed_tests=$(grep -oP '<Counters.*?failed="\K\d+' ./TestResults/*.trx)
         echo "Total tests: $total_tests" >> $GITHUB_STEP_SUMMARY
+        echo "Executed tests: $executed_tests" >> $GITHUB_STEP_SUMMARY
         echo "Passed tests: $passed_tests" >> $GITHUB_STEP_SUMMARY
         echo "Failed tests: $failed_tests" >> $GITHUB_STEP_SUMMARY
         echo "The detailed test results can be viewed in the Checks tab." >> $GITHUB_STEP_SUMMARY
