@@ -18,7 +18,7 @@ namespace ProductManagement.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var test = "";
+            // var test = "";
 
             // Add services to the container.
 
