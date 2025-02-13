@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
 
     env:
@@ -36,8 +37,8 @@ jobs:
       env:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
-    - name: Install dotnet-coverage
-      run: dotnet tool install -g dotnet-coverage      
+    # - name: Install dotnet-coverage
+    #   run: dotnet tool install -g dotnet-coverage
 
     - name: Run tests with coverage
       run: |
@@ -48,7 +49,7 @@ jobs:
         DOTNET_CLI_TELEMETRY_OPTOUT: 1      
 
     - name: List test results directory
-      run: ls -R ./TestResults
+      run: ls -R ./TestResults    
 
     - name: Publish Test Results
       uses: dorny/test-reporter@v1
@@ -63,7 +64,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Coverage Report
-        path: ./TestResults/**/*.cobertura.xml        
+        path: ./TestResults/**/*.cobertura.xml
 
     - name: Display test summary
       run: |
@@ -71,7 +72,13 @@ jobs:
         echo "Total tests: $(grep -oP '<counter><Total>\K.*(?=</Total>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
         echo "Passed tests: $(grep -oP '<counter><Passed>\K.*(?=</Passed>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
         echo "Failed tests: $(grep -oP '<counter><Failed>\K.*(?=</Failed>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
-        echo "The detailed test results can be viewed in the Checks tab." >> $GITHUB_STEP_SUMMARY  
+        echo "The detailed test results can be viewed in the Checks tab." >> $GITHUB_STEP_SUMMARY
+
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
+  
+    - name: Generate coverage report
+      run: reportgenerator -reports:./TestResults/**/*.cobertura.xml -targetdir:./TestResults/coverage -reporttypes:TextSummary
 
     - name: Display coverage summary
       run: |
@@ -81,17 +88,50 @@ jobs:
     - name: Parse coverage report
       id: coverage
       run: |       
-        COVERAGE_FILE=./TestResults/**/*.cobertura.xml
-        if [ -z "$COVERAGE_FILE" ]; then
-          echo "Coverage files not found."
+        coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
+        if (( $(echo "$coverage < 50" | bc -l) )); then
+          echo "Coverage is below 50%: $coverage%"
           exit 1
-        fi
-        COVERAGE_PERCENTAGE=$(cat $COVERAGE_FILE | jq '.[] | select(.name == "Line") | .coveredpercent')
-        echo "Coverage Percentage: $COVERAGE_PERCENTAGE"
-        echo "COVERAGE_PERCENTAGE=$COVERAGE_PERCENTAGE" >> $GITHUB_ENV
+        else
+          echo "Coverage is above 50%: $coverage%"
+        fi    
 
-    - name: Fail if coverage is below 50%
-      if: ${{ env.COVERAGE_PERCENTAGE }} < 50
-      run: |
-        echo "Code coverage is below 50%. Failing the workflow."
-        exit 1
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Deploy to Development
+      run: echo "Deploying to Development environment..."
+
+  deploy-qa:
+    name: Deploy to QA
+    runs-on: ubuntu-latest
+    needs: [build, deploy-dev]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Deploy to QA
+      run: echo "Deploying to QA environment..."
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build, deploy-dev]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Deploy to Staging
+      run: echo "Deploying to Staging environment..."
+
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, deploy-dev, deploy-qa, deploy-staging]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Deploy to Production
+      run: echo "Deploying to Production environment..."
