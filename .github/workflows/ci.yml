@@ -62,8 +62,8 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: Test Results
-        path: ./TestResults/**/*.cobertura.xml 
+        name: Coverage Report
+        path: ./TestResults/**/*.cobertura.xml        
 
     - name: Display test summary
       run: |
