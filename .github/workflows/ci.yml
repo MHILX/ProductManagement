@@ -78,20 +78,20 @@ jobs:
         echo "## Code Coverage Report" >> $GITHUB_STEP_SUMMARY
         echo "The code coverage report can be downloaded from the artifacts section." >> $GITHUB_STEP_SUMMARY
 
-    # - name: Parse coverage report
-    #   id: coverage
-    #   run: |       
-    #     COVERAGE_FILE=./TestResults/coverage.cobertura.xml
-    #     if [ -z "$COVERAGE_FILE" ]; then
-    #       echo "Coverage files not found."
-    #       exit 1
-    #     fi
-    #     COVERAGE_PERCENTAGE=$(cat $COVERAGE_FILE | jq '.[] | select(.name == "Line") | .coveredpercent')
-    #     echo "Coverage Percentage: $COVERAGE_PERCENTAGE"
-    #     echo "COVERAGE_PERCENTAGE=$COVERAGE_PERCENTAGE" >> $GITHUB_ENV
+    - name: Parse coverage report
+      id: coverage
+      run: |       
+        COVERAGE_FILE=./TestResults/**/*.cobertura.xml
+        if [ -z "$COVERAGE_FILE" ]; then
+          echo "Coverage files not found."
+          exit 1
+        fi
+        COVERAGE_PERCENTAGE=$(cat $COVERAGE_FILE | jq '.[] | select(.name == "Line") | .coveredpercent')
+        echo "Coverage Percentage: $COVERAGE_PERCENTAGE"
+        echo "COVERAGE_PERCENTAGE=$COVERAGE_PERCENTAGE" >> $GITHUB_ENV
 
-    # - name: Fail if coverage is below 50%
-    #   if: ${{ env.COVERAGE_PERCENTAGE }} < 50
-    #   run: |
-    #     echo "Code coverage is below 50%. Failing the workflow."
-    #     exit 1
+    - name: Fail if coverage is below 50%
+      if: ${{ env.COVERAGE_PERCENTAGE }} < 50
+      run: |
+        echo "Code coverage is below 50%. Failing the workflow."
+        exit 1
