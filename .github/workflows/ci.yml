@@ -80,11 +80,11 @@ jobs:
       run: |       
         coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
         if (( $(echo "$coverage < 50" | bc -l) )); then
-          message="Coverage is $coverage%, which is below the threshold of 50%. :heart:"
+          message="Coverage is $coverage%, which is below the threshold of 50%. :broken_heart:"
           echo "$message"
           exit 1
         else
-          message="Coverage is $coverage%, which is above the threshold of 50%. :broken_heart:"
+          message="Coverage is $coverage%, which is above the threshold of 50%. :heart:"
           echo "$message"
         fi
         echo "coverage_message=$message" >> $GITHUB_ENV   
@@ -93,7 +93,7 @@ jobs:
       if: always()
       run: |
         echo "### Code Coverage Report" >> $GITHUB_STEP_SUMMARY
-        echo "$coverage_message%" >> $GITHUB_STEP_SUMMARY
+        echo "$coverage_message" >> $GITHUB_STEP_SUMMARY
         echo "The code coverage report can be downloaded from the artifacts section." >> $GITHUB_STEP_SUMMARY
 
     - name: Display test summary
