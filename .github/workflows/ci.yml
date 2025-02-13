@@ -101,7 +101,7 @@ jobs:
         executed_tests=$(grep -oP '<Counters.*?executed="\K\d+' ./TestResults/*.trx)
         passed_tests=$(grep -oP '<Counters.*?passed="\K\d+' ./TestResults/*.trx)
         failed_tests=$(grep -oP '<Counters.*?failed="\K\d+' ./TestResults/*.trx)        
-        coverage=$(cat $GITHUB_OUTPUT | grep "coverage=" | awk -F'=' '{print $2}')
+        coverage=$coverage
         echo $coverage >> $GITHUB_STEP_SUMMARY
         echo "Total tests: $total_tests" >> $GITHUB_STEP_SUMMARY
         echo "Executed tests: $executed_tests" >> $GITHUB_STEP_SUMMARY
