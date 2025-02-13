@@ -68,9 +68,9 @@ jobs:
     - name: Display test summary
       run: |
         echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
-        echo "Total tests: $(grep -oP '<counter><Total>\K.*(?=</Total>)' ./TestResults/**/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
-        echo "Passed tests: $(grep -oP '<counter><Passed>\K.*(?=</Passed>)' ./TestResults/**/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
-        echo "Failed tests: $(grep -oP '<counter><Failed>\K.*(?=</Failed>)' ./TestResults/**/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
+        echo "Total tests: $(grep -oP '<counter><Total>\K.*(?=</Total>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
+        echo "Passed tests: $(grep -oP '<counter><Passed>\K.*(?=</Passed>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
+        echo "Failed tests: $(grep -oP '<counter><Failed>\K.*(?=</Failed>)' ./TestResults/*.trx | awk '{s+=$1} END {print s}')" >> $GITHUB_STEP_SUMMARY
         echo "The detailed test results can be viewed in the Checks tab." >> $GITHUB_STEP_SUMMARY  
 
     - name: Display coverage summary
