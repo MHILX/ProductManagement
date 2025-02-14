@@ -5,6 +5,13 @@ using System.Linq.Expressions;
 
 namespace ProductManagement.Infra.Repositories
 {
+    /// <summary>
+    /// The generic repository plays a crucial role in abstracting and centralizing 
+    /// data access logic. It provides a reusable and consistent way to 
+    /// perform common data operations across different entities.
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <typeparam name="TContext"></typeparam>
     public class GenericRepository<TEntity, TContext> : IGenericRepository<TEntity>, IDisposable
         where TEntity : BaseEntity
         where TContext : DbContext

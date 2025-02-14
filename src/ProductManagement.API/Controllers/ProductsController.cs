@@ -11,7 +11,7 @@ namespace ProductManagement.API.Controllers
     [Route("[controller]")]
     public sealed class ProductsController : ControllerBase
     {
-        private readonly ProductService _productService;
+        private readonly IProductService _productService;
         private readonly IMapper _mapper;
         private readonly ILogger<ProductsController> _logger;
 
@@ -21,7 +21,7 @@ namespace ProductManagement.API.Controllers
         /// <param name="productService"></param>
         /// <param name="mapper"></param>
         /// <param name="logger"></param>
-        public ProductsController(ProductService productService, IMapper mapper, ILogger<ProductsController> logger)
+        public ProductsController(IProductService productService, IMapper mapper, ILogger<ProductsController> logger)
         {
             _productService = productService;
             _mapper = mapper;
