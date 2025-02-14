@@ -86,13 +86,12 @@ jobs:
         coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
         if (( $(echo "$coverage < $CODE_COVERAGE_THRESHOLD" | bc -l) )); then
           message="Coverage is $coverage%, which is below the threshold of $CODE_COVERAGE_THRESHOLD%. :broken_heart:"
-          echo "$message"
+          echo "coverage_message=$message" >> $GITHUB_ENV 
           exit 1
         else
           message="Coverage is $coverage%, which is above the threshold of $CODE_COVERAGE_THRESHOLD%. :heart:"
-          echo "$message"
-        fi
-        echo "coverage_message=$message" >> $GITHUB_ENV   
+          echo "coverage_message=$message" >> $GITHUB_ENV 
+        fi          
         
     - name: Display coverage summary
       if: always()
