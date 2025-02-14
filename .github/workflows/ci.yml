@@ -72,15 +72,15 @@ jobs:
         path: ./TestResults/**/*.cobertura.xml    
 
     - name: Install ReportGenerator
-      if: success()
+      if: always()
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
   
     - name: Generate coverage report
-      if: success()
+      if: always()
       run: reportgenerator -reports:./TestResults/**/*.cobertura.xml -targetdir:./TestResults/coverage -reporttypes:TextSummary    
 
     - name: Parse coverage report
-      if: success()
+      if: always()
       id: coverage
       run: |       
         coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
