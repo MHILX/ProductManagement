@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**/*.md'
   pull_request:
     branches:
       - main
-
+    paths-ignore:
+      - '**/*.md'
 permissions:
   contents: read
   checks: write
@@ -19,6 +22,7 @@ jobs:
 
     env:
       SOLUTION_FILE: src/ProductManagement.sln
+      CODE_COVERAGE_THRESHOLD: 50
 
     steps:
     - name: Checkout code
@@ -52,7 +56,7 @@ jobs:
     #   run: cat ./TestResults/*.trx
 
     - name: Publish Test Results
-      if: success()
+      if: always()
       uses: dorny/test-reporter@v1      
       with:
         name: Test Results
@@ -60,31 +64,31 @@ jobs:
         reporter: dotnet-trx
 
     - name: Upload coverage report
-      if: success()
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: Coverage Report
         path: ./TestResults/**/*.cobertura.xml    
 
     - name: Install ReportGenerator
-      if: success()
+      if: always()
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
   
     - name: Generate coverage report
-      if: success()
+      if: always()
       run: reportgenerator -reports:./TestResults/**/*.cobertura.xml -targetdir:./TestResults/coverage -reporttypes:TextSummary    
 
     - name: Parse coverage report
-      if: success()
+      if: always()
       id: coverage
       run: |       
         coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
-        if (( $(echo "$coverage < 50" | bc -l) )); then
-          message="Coverage is $coverage%, which is below the threshold of 50%. :broken_heart:"
+        if (( $(echo "$coverage < $CODE_COVERAGE_THRESHOLD" | bc -l) )); then
+          message="Coverage is $coverage%, which is below the threshold of $CODE_COVERAGE_THRESHOLD%. :broken_heart:"
           echo "$message"
           exit 1
         else
-          message="Coverage is $coverage%, which is above the threshold of 50%. :heart:"
+          message="Coverage is $coverage%, which is above the threshold of $CODE_COVERAGE_THRESHOLD%. :heart:"
           echo "$message"
         fi
         echo "coverage_message=$message" >> $GITHUB_ENV   
