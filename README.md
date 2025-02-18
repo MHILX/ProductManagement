@@ -76,16 +76,18 @@ The system is divided into layers that each have distinct responsibilities.
 ### Dependency Rule: 
 Dependencies should point inward. High-level policies should not depend on 
 low-level details.
+
 ### Entities (Domain Model):
 Represent the core business logic and rules independent of application concerns.
+
 ### Use Cases (Application Layer):
 Orchestrate business rules to fulfill application-specific tasks. They act as 
 an intermediary between the domain and interface layers.
+
 ### Interface Adapters:
 Translate data between external systems (like databases, UIs, or APIs) and 
 the use cases/domain entities.
+
 ### Frameworks and Drivers:
 The outermost layer which includes UI, database, web frameworks, 
 and other external components.
-
-
