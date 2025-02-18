@@ -8,6 +8,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{08D342D8-5F0F-4BFC-A2AD-7CC08FEF6305}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		..\docker-compose.yml = ..\docker-compose.yml
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductManagement.Test", "ProductManagement.Test\ProductManagement.Test.csproj", "{F20FA0E8-6A3C-48E5-AF09-CF43EDCEC476}"
@@ -47,5 +49,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {892604E1-F5C4-4311-9D2D-3CADB993CB16}
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,9 @@
 
+using Microsoft.EntityFrameworkCore;
+using ProductManagement.App.Profiles;
 using ProductManagement.App.Services;
 using ProductManagement.Core.Interfaces;
+using ProductManagement.Infra.Contexts;
 using ProductManagement.Infra.Repositories;
 
 namespace ProductManagement.API
@@ -18,8 +21,6 @@ namespace ProductManagement.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // var test = "";
-
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -27,8 +28,16 @@ namespace ProductManagement.API
             builder.Services.AddOpenApi(); // Document name is v1
             builder.Services.AddOpenApi("internal"); // Document name is internal
 
-            builder.Services.AddScoped<IProductRepo, ProductRepo>(); // Register IProductRepo with its implementation
-            builder.Services.AddScoped<ProductService>(); // Register ProductService
+            // Register the ProductContext with the dependency injection container
+            builder.Services.AddDbContext<ProductContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddScoped<IProductRepository, ProductRepository>(); // Register IProductRepo with its implementation
+            builder.Services.AddScoped<IProductService, ProductService>(); // Register IProductService with its implementation
+
+
+            // Register AutoMapper
+            builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 
             var app = builder.Build();
 

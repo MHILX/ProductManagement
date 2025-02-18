@@ -1,6 +1,6 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ProductManagement.App.Services;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ProductManagement.API.Controllers
 {
@@ -11,17 +11,20 @@ namespace ProductManagement.API.Controllers
     [Route("[controller]")]
     public sealed class ProductsController : ControllerBase
     {
-        private readonly ProductService _productService;
+        private readonly IProductService _productService;
+        private readonly IMapper _mapper;
         private readonly ILogger<ProductsController> _logger;
 
         /// <summary>
         /// Constructor for ProductsController.
         /// </summary>
         /// <param name="productService"></param>
+        /// <param name="mapper"></param>
         /// <param name="logger"></param>
-        public ProductsController(ProductService productService, ILogger<ProductsController> logger)
+        public ProductsController(IProductService productService, IMapper mapper, ILogger<ProductsController> logger)
         {
             _productService = productService;
+            _mapper = mapper;
             _logger = logger;
             _logger.LogInformation("Instantiated {ControllerName}", nameof(ProductsController));
         }

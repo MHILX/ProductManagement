@@ -1,46 +1,56 @@
-﻿using ProductManagement.App.DTOs;
+﻿using AutoMapper;
+using ProductManagement.App.DTOs;
 using ProductManagement.Core.Entities;
 using ProductManagement.Core.Interfaces;
 
 namespace ProductManagement.App.Services
 {
-    public class ProductService
+    /// <summary>
+    ///  The ProductService plays a crucial role in encapsulating business logic and 
+    ///  ensuring that the application remains modular, maintainable, and testable.
+    /// </summary>
+    public class ProductService : IProductService
     {
-        private readonly IProductRepo _productRepo;
+        private readonly IProductRepository _productRepository;
+        private readonly IMapper _mapper;
 
-        public ProductService(IProductRepo productRepo)
+        public ProductService(IProductRepository productRepo, IMapper mapper)
         {
-            _productRepo = productRepo;
+            _productRepository = productRepo;
+            _mapper = mapper;
         }
 
         public IEnumerable<ProductDto> GetAllProducts()
         {
-            IEnumerable<Product> products = _productRepo.GetAllProducts();
-            return products.Select(p => new ProductDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                Description = p.Description
-            });
+            IEnumerable<Product> products = _productRepository.GetAll();
+            return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
         public ProductDto? GetProductById(int id)
         {
-            var product = _productRepo.GetAllProducts().FirstOrDefault(p => p.Id == id);
-            
-            if (product == null)
-            {
-                return null;
-            }
+            var product = _productRepository.GetById<int>(id);
+            return product == null ? null : _mapper.Map<ProductDto>(product);
+        }
 
-            return new ProductDto
+        public void AddProduct(ProductDto productDto)
+        {
+            var product = _mapper.Map<Product>(productDto);
+            _productRepository.Add(product);
+        }
+
+        public void UpdateProduct(ProductDto productDto)
+        {
+            var product = _mapper.Map<Product>(productDto);
+            _productRepository.Update(product);
+        }
+
+        public void DeleteProduct(int id)
+        {
+            var product = _productRepository.GetById<int>(id);
+            if (product != null)
             {
-                Id = product.Id,
-                Name = product.Name,
-                Price = product.Price,
-                Description = product.Description
-            };
+                _productRepository.Delete(product);
+            }
         }
     }
 }
