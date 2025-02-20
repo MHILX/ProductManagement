@@ -21,8 +21,10 @@ namespace ProductManagement.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Add explicit configuration (optional if you need specific options)
+            builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
+            // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi(); // Document name is v1
@@ -34,7 +36,6 @@ namespace ProductManagement.API
 
             builder.Services.AddScoped<IProductRepository, ProductRepository>(); // Register IProductRepo with its implementation
             builder.Services.AddScoped<IProductService, ProductService>(); // Register IProductService with its implementation
-
 
             // Register AutoMapper
             builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
