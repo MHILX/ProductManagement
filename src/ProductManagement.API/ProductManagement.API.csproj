@@ -24,6 +24,12 @@
 		<ProjectReference Include="..\ProductManagement.Infra\ProductManagement.Infra.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 	<PropertyGroup>
 		<Authors>Mohammed</Authors>
 		<Title>ProductManagement.API</Title>
