@@ -24,7 +24,6 @@ namespace ProductManagement.API.Controllers
         public ProductsController(IProductService productService, IMapper mapper, ILogger<ProductsController> logger)
         {
             _productService = productService;
-            // _mapper = mapper;
             _logger = logger;
             _logger.LogInformation("Instantiated {ControllerName}", nameof(ProductsController));
         }
