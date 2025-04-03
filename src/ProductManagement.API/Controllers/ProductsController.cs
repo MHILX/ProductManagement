@@ -12,7 +12,7 @@ namespace ProductManagement.API.Controllers
     public sealed class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly IMapper _mapper;
+        // private readonly IMapper _mapper;
         private readonly ILogger<ProductsController> _logger;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace ProductManagement.API.Controllers
         public ProductsController(IProductService productService, IMapper mapper, ILogger<ProductsController> logger)
         {
             _productService = productService;
-            _mapper = mapper;
+            // _mapper = mapper;
             _logger = logger;
             _logger.LogInformation("Instantiated {ControllerName}", nameof(ProductsController));
         }
