@@ -101,6 +101,12 @@ jobs:
       if: always()
       run: cat ./TestResults/coverage/Summary.txt
 
+    - name: Print extracted coverage percentage for debugging
+      if: always()
+      run: |
+        coverage=$(grep "Line coverage" ./TestResults/coverage/Summary.txt | awk '{print $3}' | tr -d '%')
+        echo "Extracted coverage percentage: $coverage%"
+
     # - name: Parse coverage report
     #   if: always()
     #   id: coverage
