@@ -7,17 +7,14 @@ using Xunit;
 
 namespace ProductManagement.Test
 {
-    public class GenericRepositoryTests
+    public class GenericRepositoryTests : IClassFixture<DatabaseFixture>
     {
         private readonly ProductContext _context;
         private readonly GenericRepository<Product, ProductContext> _repository;
 
-        public GenericRepositoryTests()
+        public GenericRepositoryTests(DatabaseFixture fixture)
         {
-            var options = new DbContextOptionsBuilder<ProductContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase")
-                .Options;
-            _context = new ProductContext(options);
+            _context = fixture.Context;
             _repository = new GenericRepository<Product, ProductContext>(_context);
         }
 
@@ -27,8 +24,8 @@ namespace ProductManagement.Test
             // Arrange
             var products = new List<Product>
             {
-                new Product { Id = 1, Name = "Product1", Price = 10 },
-                new Product { Id = 2, Name = "Product2", Price = 20 }
+                new() { Id = 1, Name = "Product1", Price = 10 },
+                new() { Id = 2, Name = "Product2", Price = 20 }
             };
 
             _context.Products.AddRange(products);
@@ -54,6 +51,25 @@ namespace ProductManagement.Test
 
             // Assert
             Assert.Equal(product, result);
+        }
+    }
+
+    public class DatabaseFixture : IDisposable
+    {
+        public ProductContext Context { get; private set; }
+
+        public DatabaseFixture()
+        {
+            var options = new DbContextOptionsBuilder<ProductContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
+                .Options;
+            Context = new ProductContext(options);
+        }
+
+        public void Dispose()
+        {
+            Context.Database.EnsureDeleted();
+            Context.Dispose();
         }
     }
 }
