@@ -101,11 +101,25 @@ jobs:
       if: always()
       run: cat ./TestResults/coverage/Summary.txt
 
+    # - name: Parse coverage report
+    #   if: always()
+    #   id: coverage
+    #   run: |       
+    #     coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
+    #     if (( $(echo "$coverage < $CODE_COVERAGE_THRESHOLD" | bc -l) )); then
+    #       message="Coverage is $coverage%, which is below the threshold of $CODE_COVERAGE_THRESHOLD%. :broken_heart:"
+    #       echo "coverage_message=$message" >> $GITHUB_ENV 
+    #       exit 1
+    #     else
+    #       message="Coverage is $coverage%, which is above the threshold of $CODE_COVERAGE_THRESHOLD%. :heart:"
+    #       echo "coverage_message=$message" >> $GITHUB_ENV 
+    #     fi
+
     - name: Parse coverage report
       if: always()
       id: coverage
       run: |       
-        coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
+        coverage=$(grep "Line coverage" ./TestResults/coverage/Summary.txt | awk '{print $3}' | tr -d '%')
         if (( $(echo "$coverage < $CODE_COVERAGE_THRESHOLD" | bc -l) )); then
           message="Coverage is $coverage%, which is below the threshold of $CODE_COVERAGE_THRESHOLD%. :broken_heart:"
           echo "coverage_message=$message" >> $GITHUB_ENV 
@@ -113,7 +127,7 @@ jobs:
         else
           message="Coverage is $coverage%, which is above the threshold of $CODE_COVERAGE_THRESHOLD%. :heart:"
           echo "coverage_message=$message" >> $GITHUB_ENV 
-        fi          
+        fi 
         
     - name: Display coverage summary
       if: always()
