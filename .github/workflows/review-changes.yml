@@ -1,0 +1,78 @@
+name: Review Changes with Model
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    env:
+      MODEL_NAME: "deepseek-r1:latest"
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Fetch enough history to get the diff
+
+      # Install Ollama
+      - name: Install Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama --version  # Verify installation
+
+      # Cache Ollama models
+      - name: Cache Ollama models
+        id: cache-ollama
+        uses: actions/cache@v4
+        with:
+          path: ~/.ollama
+          key: ollama-models-${{ env.MODEL_NAME }}
+
+      # Pull the model if not cached
+      - name: Pull Model if not cached
+        if: steps.cache-ollama.outputs.cache-hit != 'true'
+        run: ollama pull ${{ env.MODEL_NAME }}
+
+      # Start Ollama server in the background
+      - name: Start Ollama Server
+        run: |
+          ollama serve &
+          # Wait for the server to be ready (check API endpoint)
+          timeout 30s bash -c "until curl -s http://localhost:11434 > /dev/null; do sleep 1; done"
+
+      # Extract changes from the pull request
+      - name: Get Changeset
+        run: |
+          git fetch origin
+          git diff HEAD^ HEAD > changeset.diff
+          cat changeset.diff  # For debugging
+
+      # Send changeset to the model for review
+      - name: Review Changes with Model
+        run: |
+          REVIEW=$(curl -s -X POST http://localhost:11434/api/generate \
+            -d '{
+              "model": "'$MODEL_NAME'",
+              "prompt": "Review the following code changes and provide feedback:\n\n$(cat changeset.diff)",
+              "stream": false
+            }' | jq -r '.response')
+          echo "Review: $REVIEW"
+          echo "REVIEW=$REVIEW" >> $GITHUB_ENV
+
+      # Post review as a PR comment (optional)
+      - name: Post Review Comment
+        if: env.REVIEW != ''
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const review = process.env.REVIEW;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `### Model Review\n\n${review}`
+            });

@@ -100,27 +100,7 @@ jobs:
     - name: Print coverage summary for debugging
       if: always()
       run: cat ./TestResults/coverage/Summary.txt
-
-    # - name: Print extracted coverage percentage for debugging
-    #   if: always()
-    #   run: |
-    #     coverage=$(grep "Line coverage" ./TestResults/coverage/Summary.txt | awk '{print $3}' | tr -d '%')
-    #     echo "Extracted coverage percentage: $coverage%"
-
-    # - name: Parse coverage report
-    #   if: always()
-    #   id: coverage
-    #   run: |       
-    #     coverage=$(cat ./TestResults/coverage/Summary.txt | grep "Line coverage" | awk '{print $3}' | tr -d '%')
-    #     if (( $(echo "$coverage < $CODE_COVERAGE_THRESHOLD" | bc -l) )); then
-    #       message="Coverage is $coverage%, which is below the threshold of $CODE_COVERAGE_THRESHOLD%. :broken_heart:"
-    #       echo "coverage_message=$message" >> $GITHUB_ENV 
-    #       exit 1
-    #     else
-    #       message="Coverage is $coverage%, which is above the threshold of $CODE_COVERAGE_THRESHOLD%. :heart:"
-    #       echo "coverage_message=$message" >> $GITHUB_ENV 
-    #     fi
-
+      
     - name: Parse coverage report
       if: always()
       id: coverage
