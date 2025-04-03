@@ -97,6 +97,10 @@ jobs:
       if: always()
       run: reportgenerator -reports:./TestResults/**/*.cobertura.xml -targetdir:./TestResults/coverage -reporttypes:TextSummary    
 
+    - name: Print coverage summary for debugging
+      if: always()
+      run: cat ./TestResults/coverage/Summary.txt
+
     - name: Parse coverage report
       if: always()
       id: coverage
