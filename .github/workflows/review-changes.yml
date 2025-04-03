@@ -1,56 +1,49 @@
 name: Review Changes with Model
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
-      - main
+      - main  # Adjust this to your default branch, e.g., 'master' or 'develop'
 
 jobs:
   review:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write  # Allows the workflow to write comments on issues and pull requests
     env:
-      MODEL_NAME: "deepseek-r1:latest"
+      MODEL_NAME: "deepseek-r1:latest"  # Specify the model you want to use
     steps:
-      # Checkout the repository code
-      - name: Checkout code
+      # Checkout the base branch to ensure no untrusted code from the PR is executed
+      - name: Checkout base branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # Fetch enough history to get the diff
+          ref: ${{ github.event.pull_request.base.ref }}
 
-      # Install Ollama
+      # Fetch the pull request branch to compare changes
+      - name: Fetch pull request branch
+        run: git fetch origin pull/${{ github.event.pull_request.number }}/head:pr-branch
+
+      # Generate a diff between the base branch and the pull request
+      - name: Generate diff
+        run: git diff ${{ github.event.pull_request.base.sha }} pr-branch > changeset.diff
+
+      # Install Ollama, a tool to run the model
       - name: Install Ollama
         run: |
           curl -fsSL https://ollama.com/install.sh | sh
-          ollama --version  # Verify installation
+          ollama --version  # Confirm the installation
 
-      # Cache Ollama models
-      - name: Cache Ollama models
-        id: cache-ollama
-        uses: actions/cache@v4
-        with:
-          path: ~/.ollama
-          key: ollama-models-${{ env.MODEL_NAME }}
-
-      # Pull the model if not cached
+      # Pull the specified model if it’s not already cached
       - name: Pull Model if not cached
-        if: steps.cache-ollama.outputs.cache-hit != 'true'
         run: ollama pull ${{ env.MODEL_NAME }}
 
-      # Start Ollama server in the background
+      # Start the Ollama server in the background
       - name: Start Ollama Server
         run: |
           ollama serve &
-          # Wait for the server to be ready (check API endpoint)
           timeout 30s bash -c "until curl -s http://localhost:11434 > /dev/null; do sleep 1; done"
 
-      # Extract changes from the pull request
-      - name: Get Changeset
-        run: |
-          git fetch origin
-          git diff HEAD^ HEAD > changeset.diff
-          cat changeset.diff  # For debugging
-
-      # Send changeset to the model for review
+      # Send the diff to the model for review and capture the response
       - name: Review Changes with Model
         run: |
           REVIEW=$(curl -s -X POST http://localhost:11434/api/generate \
@@ -62,9 +55,8 @@ jobs:
           echo "Review: $REVIEW"
           echo "REVIEW=$REVIEW" >> $GITHUB_ENV
 
-      # Post review as a PR comment (optional)
+      # Post the model’s review as a comment on the pull request
       - name: Post Review Comment
-        if: env.REVIEW != ''
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
