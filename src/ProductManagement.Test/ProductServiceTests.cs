@@ -35,15 +35,15 @@ namespace ProductManagement.Test
                 new() { Id = 2, Name = "Product 2", Price = 20, Description = "Description 2" }
             };
 
-            _mockProductRepository.Setup(repo => repo.GetAll()).Returns(products);
-            _mockProductRepository.Setup(repo => repo.GetById(It.IsAny<int>())).Returns((int id) => products.FirstOrDefault(p => p.Id == id));
+            _mockProductRepository.Setup(repo => repo.GetAllAsync()).ReturnsAsync(products);
+            _mockProductRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((int id) => products.FirstOrDefault(p => p.Id == id));
         }
 
         [Fact]
-        public void Test_GetAllProduct()
+        public async Task Test_GetAllProduct()
         {
             // Act
-            IEnumerable<ProductDto> products = _productService.GetAllProducts();
+            IEnumerable<ProductDto> products = await _productService.GetAllProductsAsync();
 
             // Assert
             Assert.NotNull(products);
@@ -52,13 +52,13 @@ namespace ProductManagement.Test
         }
 
         [Fact]
-        public void Test_GetProductById()
+        public async Task Test_GetProductById()
         {
             // Arrange
-            var product = _productService.GetAllProducts().FirstOrDefault();
+            var product = (await _productService.GetAllProductsAsync()).FirstOrDefault();
 
             // Act
-            ProductDto? productDto = _productService.GetProductById(product?.Id ?? 0);
+            ProductDto? productDto = await _productService.GetProductByIdAsync(product?.Id ?? 0);
 
             // Assert
             Assert.NotNull(productDto);

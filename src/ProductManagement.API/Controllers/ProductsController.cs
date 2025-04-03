@@ -34,10 +34,10 @@ namespace ProductManagement.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet(Name = "GetProducts")]
-        public IActionResult Get()
+        public async Task<IActionResult> GetAsync()
         {
-            _logger.LogInformation("Invoked {MethodName}", nameof(Get));
-            var products = _productService.GetAllProducts();
+            _logger.LogInformation("Invoked {MethodName}", nameof(GetAsync));
+            var products = await _productService.GetAllProductsAsync().ConfigureAwait(false);
             return Ok(products);
         }
 
@@ -47,10 +47,10 @@ namespace ProductManagement.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}", Name = "GetProductById")]
-        public IActionResult GetProductById(int id)
+        public async Task<IActionResult> GetProductByIdAsync(int id)
         {
-            _logger.LogInformation("Invoked {MethodName} with ID: {Id}", nameof(GetProductById), id);
-            var product = _productService.GetProductById(id);
+            _logger.LogInformation("Invoked {MethodName} with ID: {Id}", nameof(GetProductByIdAsync), id);
+            var product = await _productService.GetProductByIdAsync(id).ConfigureAwait(false);
 
             if (product == null)
             {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Moq;
 using ProductManagement.Core.Entities;
 using ProductManagement.Infra.Contexts;
 using ProductManagement.Infra.Repositories;
@@ -15,14 +14,15 @@ namespace ProductManagement.Test
         public ProductRepositoryTests()
         {
             var options = new DbContextOptionsBuilder<ProductContext>()
-                 .UseInMemoryDatabase(databaseName: "TestDatabase")
+                 .UseInMemoryDatabase(databaseName: $"TestDatabase_{Guid.NewGuid}")
                  .Options;
 
             _context = new ProductContext(options);
-            _productRepository = new ProductRepository(_context);
 
             // Seed the in-memory database with test data
             SeedDatabase();
+
+            _productRepository = new ProductRepository(_context);            
         }
 
         private void SeedDatabase()
@@ -38,10 +38,10 @@ namespace ProductManagement.Test
         }
 
         [Fact]
-        public void GetProducts_ReturnsAllProducts()
+        public async Task GetProducts_ReturnsAllProductsAsync()
         {
             // Act
-            var products = _productRepository.GetAll();
+            var products = await _productRepository.GetAllAsync();
 
             // Assert
             Assert.NotNull(products);

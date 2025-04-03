@@ -2,8 +2,6 @@
 using Moq;
 using ProductManagement.API.Controllers;
 using ProductManagement.App.DTOs;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 using ProductManagement.App.Services;
 using AutoMapper;
@@ -26,7 +24,7 @@ namespace ProductManagement.Test
         }
 
         [Fact]
-        public void Get_ReturnsOkResult_WithListOfProducts()
+        public async Task Get_ReturnsOkResult_WithListOfProductsAsync()
         {
             // Arrange
             var products = new List<ProductDto>
@@ -35,10 +33,10 @@ namespace ProductManagement.Test
                 new() { Id = 2, Name = "Product2", Price = 20 }
             };
 
-            _mockProductService.Setup(service => service.GetAllProducts()).Returns(products);
+            _mockProductService.Setup(service => service.GetAllProductsAsync()).ReturnsAsync(products);
 
             // Act
-            var result = _controller.Get();
+            var result = await _controller.GetAsync();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -47,13 +45,13 @@ namespace ProductManagement.Test
         }
 
         [Fact]
-        public void GetProductById_ReturnsNotFound_WhenProductDoesNotExist()
+        public async Task GetProductById_ReturnsNotFound_WhenProductDoesNotExistAsync()
         {
             // Arrange
-            _mockProductService.Setup(service => service.GetProductById(1)).Returns(null as ProductDto);
+            _mockProductService.Setup(service => service.GetProductByIdAsync(1)).ReturnsAsync(null as ProductDto);
 
             // Act
-            var result = _controller.GetProductById(1);
+            var result = await _controller.GetProductByIdAsync(1);
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundResult>(result);

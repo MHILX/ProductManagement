@@ -20,36 +20,36 @@ namespace ProductManagement.App.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<ProductDto> GetAllProducts()
+        public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
         {
-            IEnumerable<Product> products = _productRepository.GetAll();
+            IEnumerable<Product> products = await _productRepository.GetAllAsync();
             return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
 
-        public ProductDto? GetProductById(int id)
+        public async Task<ProductDto?> GetProductByIdAsync(int id)
         {
-            var product = _productRepository.GetById<int>(id);
+            var product = await _productRepository.GetByIdAsync<int>(id);
             return product == null ? null : _mapper.Map<ProductDto>(product);
         }
 
-        public void AddProduct(ProductDto productDto)
+        public async Task AddProductAsync(ProductDto productDto)
         {
             var product = _mapper.Map<Product>(productDto);
-            _productRepository.Add(product);
+            await _productRepository.AddAsync(product);
         }
 
-        public void UpdateProduct(ProductDto productDto)
+        public async Task UpdateProductAsync(ProductDto productDto)
         {
             var product = _mapper.Map<Product>(productDto);
-            _productRepository.Update(product);
+            await _productRepository.UpdateAsync(product);
         }
 
-        public void DeleteProduct(int id)
+        public async Task DeleteProductAsync(int id)
         {
-            var product = _productRepository.GetById<int>(id);
+            var product = await _productRepository.GetByIdAsync<int>(id);
             if (product != null)
             {
-                _productRepository.Delete(product);
+                await _productRepository.DeleteAsync(product);
             }
         }
     }
