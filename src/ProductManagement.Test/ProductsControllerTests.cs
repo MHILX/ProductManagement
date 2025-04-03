@@ -31,8 +31,8 @@ namespace ProductManagement.Test
             // Arrange
             var products = new List<ProductDto>
             {
-                new ProductDto { Id = 1, Name = "Product1", Price = 10 },
-                new ProductDto { Id = 2, Name = "Product2", Price = 20 }
+                new() { Id = 1, Name = "Product1", Price = 10 },
+                new() { Id = 2, Name = "Product2", Price = 20 }
             };
 
             _mockProductService.Setup(service => service.GetAllProducts()).Returns(products);
