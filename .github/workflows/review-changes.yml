@@ -52,6 +52,8 @@ jobs:
               "prompt": "Review the following code changes and provide feedback:\n\n$(cat changeset.diff)",
               "stream": false
             }' | jq -r '.response')
+          echo "Raw response: $RAW_RESPONSE"
+          REVIEW=$(echo "$RAW_RESPONSE" | jq -r '.response')
           echo "Review: $REVIEW"
           echo "REVIEW<<EOF" >> $GITHUB_ENV
           echo "$REVIEW" >> $GITHUB_ENV
