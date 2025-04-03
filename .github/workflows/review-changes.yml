@@ -46,20 +46,21 @@ jobs:
       # Send the diff to the model for review and capture the response
       - name: Review Changes with Model
         run: |
-          REVIEW=$(curl -s -X POST http://localhost:11434/api/generate \
+          RAW_RESPONSE=$(curl -s -X POST http://localhost:11434/api/generate \
             -d '{
               "model": "'$MODEL_NAME'",
               "prompt": "Review the following code changes and provide feedback:\n\n$(cat changeset.diff)",
               "stream": false
             }')
 
-          echo "Raw response: $RAW_RESPONSE"
+          echo "Raw response: $RAW_RESPONSE"  # For debug purposes
+
           REVIEW=$(echo "$RAW_RESPONSE" | jq -r '.response')
-          echo "Review: $REVIEW"
-          echo "REVIEW=$REVIEW" >> $GITHUB_ENV # Set the environment variable
-          # echo "REVIEW<<EOF" >> $GITHUB_ENV
-          # echo "$REVIEW" >> $GITHUB_ENV
-          # echo "EOF" >> $GITHUB_ENV
+
+          echo "Review: $REVIEW" # For debug purposes
+
+          # Properly format and set the REVIEW environment variable using jq
+          echo "REVIEW=$(jq -n --arg review "$REVIEW" '$env.review')" >> $GITHUB_ENV
 
       # Post the model’s review as a comment on the pull request
       - name: Post Review Comment
