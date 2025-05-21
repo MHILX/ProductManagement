@@ -1,4 +1,4 @@
-name: Review Changes with Model
+name: Review Changes with AI
 
 on:
   pull_request_target:
@@ -7,10 +7,11 @@ on:
 
 jobs:
   review:
-    name: Review Changes with Model
+    name: Review Changes with AI
     runs-on: ubuntu-latest
     permissions:
       issues: write  # Allows the workflow to write comments on issues and pull requests
+      pull-requests: write  # Allows the workflow to write comments on pull requests
     env:
       MODEL_NAME: "deepseek-r1:latest"  # Specify the model you want to use
     steps:
@@ -94,5 +95,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `### Model Review\n\n${review}`
+              body: `### AI Review\n\n${review}`
             });
