@@ -7,6 +7,7 @@ on:
 
 jobs:
   review:
+    name: Review Changes with Model
     runs-on: ubuntu-latest
     permissions:
       issues: write  # Allows the workflow to write comments on issues and pull requests
@@ -25,7 +26,9 @@ jobs:
 
       # Generate a diff between the base branch and the pull request
       - name: Generate diff
-        run: git diff ${{ github.event.pull_request.base.sha }} pr-branch > changeset.diff
+        run: |
+          git diff ${{ github.event.pull_request.base.sha }} pr-branch > changeset.diff
+          cat changeset.diff
 
       # Install Ollama, a tool to run the model
       - name: Install Ollama
@@ -33,29 +36,54 @@ jobs:
           curl -fsSL https://ollama.com/install.sh | sh
           ollama --version  # Confirm the installation
 
-      # Pull the specified model if it’s not already cached
+      # Pull the specified model if itï¿½s not already cached
       - name: Pull Model if not cached
-        run: ollama pull ${{ env.MODEL_NAME }}
+        run: | 
+          ollama list
+          ollama pull ${{ env.MODEL_NAME }}
 
       # Start the Ollama server in the background
       - name: Start Ollama Server
         run: |
-          ollama serve &
-          timeout 30s bash -c "until curl -s http://localhost:11434 > /dev/null; do sleep 1; done"
+          if lsof -i:11434; then
+            echo "Ollama server already running on port 11434"
+          else
+            ollama serve &
+            timeout 30s bash -c "until curl -s http://localhost:11434 > /dev/null; do sleep 1; done"
+          fi
 
       # Send the diff to the model for review and capture the response
-      - name: Review Changes with Model
+      - name: Review Changes with AI
         run: |
-          REVIEW=$(curl -s -X POST http://localhost:11434/api/generate \
+          RAW_RESPONSE=$(curl -s -X POST http://localhost:11434/api/generate \
             -d '{
               "model": "'$MODEL_NAME'",
-              "prompt": "Review the following code changes and provide feedback:\n\n$(cat changeset.diff)",
+              "prompt": "Review the following code changes and provide feedback. Only output the final review without any internal thoughts or reasoning:\n\n$(cat changeset.diff)",
               "stream": false
-            }' | jq -r '.response')
-          echo "Review: $REVIEW"
-          echo "REVIEW=$REVIEW" >> $GITHUB_ENV
+            }')
 
-      # Post the model’s review as a comment on the pull request
+          # For debug purposes
+          echo "Raw response: $RAW_RESPONSE"
+
+          # Try to extract the response, fallback to a default message if not found
+          REVIEW=$(echo "$RAW_RESPONSE" | jq -r '.response')          
+
+          if [ -z "$REVIEW" ]; then
+            echo "Model did not return a valid review. Check RAW_RESPONSE for errors."
+            REVIEW="Model did not return a valid review. RAW_RESPONSE: $RAW_RESPONSE"
+          fi
+
+          # For debug purposes
+          echo "Review: $REVIEW"
+
+          # Properly format and set the REVIEW environment variable using jq
+          {
+            echo "REVIEW<<UNIQUE_DELIMITER_12345"
+            echo "$REVIEW"
+            echo "UNIQUE_DELIMITER_12345"
+          } >> $GITHUB_ENV
+
+      # Post the modelï¿½s review as a comment on the pull request
       - name: Post Review Comment
         uses: actions/github-script@v6
         with:
