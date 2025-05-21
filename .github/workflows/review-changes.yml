@@ -49,12 +49,12 @@ jobs:
           fi
 
       # Send the diff to the model for review and capture the response
-      - name: Review Changes with Model
+      - name: Review Changes with AI
         run: |
           RAW_RESPONSE=$(curl -s -X POST http://localhost:11434/api/generate \
             -d '{
               "model": "'$MODEL_NAME'",
-              "prompt": "Review the following code changes and provide feedback:\n\n$(cat changeset.diff)",
+              "prompt": "Review the following code changes and provide feedback. Only output the final review without any internal thoughts or reasoning:\n\n$(cat changeset.diff)",
               "stream": false
             }')
 
@@ -74,9 +74,9 @@ jobs:
 
           # Properly format and set the REVIEW environment variable using jq
           {
-            echo "REVIEW<<EOF"
+            echo "REVIEW<<UNIQUE_DELIMITER_12345"
             echo "$REVIEW"
-            echo "EOF"
+            echo "UNIQUE_DELIMITER_12345"
           } >> $GITHUB_ENV
 
       # Post the model�s review as a comment on the pull request
