@@ -7,6 +7,7 @@ on:
 
 jobs:
   review:
+    name: Review Changes with Model
     runs-on: ubuntu-latest
     permissions:
       issues: write  # Allows the workflow to write comments on issues and pull requests
@@ -53,14 +54,21 @@ jobs:
               "stream": false
             }')
 
-          echo "Raw response: $RAW_RESPONSE"  # For debug purposes
+          # For debug purposes
+          echo "Raw response: $RAW_RESPONSE"
 
-          REVIEW=$(echo "$RAW_RESPONSE" | jq -r '.response')
+          # Try to extract the response, fallback to a default message if not found
+          REVIEW=$(echo "$RAW_RESPONSE" | jq -r '.response')          
 
-          echo "Review: $REVIEW" # For debug purposes
+          if [ -z "$REVIEW" ]; then
+            echo "Model did not return a valid review. Check RAW_RESPONSE for errors."
+            REVIEW="Model did not return a valid review. RAW_RESPONSE: $RAW_RESPONSE"
+          fi
+
+          # For debug purposes
+          echo "Review: $REVIEW"
 
           # Properly format and set the REVIEW environment variable using jq
-          # echo "REVIEW=$(jq -n --arg review "$REVIEW" '$env.review')" >> $GITHUB_ENV
           {
             echo "REVIEW<<EOF"
             echo "$REVIEW"
