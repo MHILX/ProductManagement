@@ -1,24 +1,35 @@
-version: '3'
-
+name: productmanagement
 services:
-  api:
-    build: ./src/ProductManagement.API
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db;Database=productmanagement;Username=postgres;Password=postgres
+  # api:
+  #   build: ./src/ProductManagement.API
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ConnectionStrings__DefaultConnection=Host=pgdbhost;Database=ProductManagementDb;Username=yourusername;Password=yourpassword
 
-  db:
+  pgdbhost:
     image: postgres:13
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=productmanagement
+      - POSTGRES_USER=yourusername
+      - POSTGRES_PASSWORD=yourpassword
+      - POSTGRES_DB=ProductManagementDb
+    ports:
+      - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - pgdbhost    
 
 volumes:
   db-data:
