@@ -26,7 +26,9 @@ jobs:
 
       # Generate a diff between the base branch and the pull request
       - name: Generate diff
-        run: git diff ${{ github.event.pull_request.base.sha }} pr-branch > changeset.diff
+        run: |
+          git diff ${{ github.event.pull_request.base.sha }} pr-branch > changeset.diff
+          cat changeset.diff
 
       # Install Ollama, a tool to run the model
       - name: Install Ollama
@@ -36,7 +38,9 @@ jobs:
 
       # Pull the specified model if it�s not already cached
       - name: Pull Model if not cached
-        run: ollama pull ${{ env.MODEL_NAME }}
+        run: | 
+          ollama list
+          ollama pull ${{ env.MODEL_NAME }}
 
       # Start the Ollama server in the background
       - name: Start Ollama Server
