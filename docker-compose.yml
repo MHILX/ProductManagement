@@ -1,4 +1,4 @@
-name: productmanagement
+name: product-management
 services:
   # api:
   #   build: ./src/ProductManagement.API
@@ -31,5 +31,5 @@ services:
     depends_on:
       - pgdbhost    
 
-volumes:
-  db-data:
+# volumes:
+#   db-data:
