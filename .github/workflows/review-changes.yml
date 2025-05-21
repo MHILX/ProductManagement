@@ -33,7 +33,7 @@ jobs:
           curl -fsSL https://ollama.com/install.sh | sh
           ollama --version  # Confirm the installation
 
-      # Pull the specified model if it’s not already cached
+      # Pull the specified model if itï¿½s not already cached
       - name: Pull Model if not cached
         run: ollama pull ${{ env.MODEL_NAME }}
 
@@ -60,9 +60,14 @@ jobs:
           echo "Review: $REVIEW" # For debug purposes
 
           # Properly format and set the REVIEW environment variable using jq
-          echo "REVIEW=$(jq -n --arg review "$REVIEW" '$env.review')" >> $GITHUB_ENV
+          # echo "REVIEW=$(jq -n --arg review "$REVIEW" '$env.review')" >> $GITHUB_ENV
+          {
+            echo "REVIEW<<EOF"
+            echo "$REVIEW"
+            echo "EOF"
+          } >> $GITHUB_ENV
 
-      # Post the model’s review as a comment on the pull request
+      # Post the modelï¿½s review as a comment on the pull request
       - name: Post Review Comment
         uses: actions/github-script@v6
         with:
