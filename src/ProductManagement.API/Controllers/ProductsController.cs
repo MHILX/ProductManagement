@@ -12,7 +12,7 @@ namespace ProductManagement.API.Controllers
     public sealed class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
-        // private readonly IMapper _mapper;
+        private readonly IMapper _mapper;
         private readonly ILogger<ProductsController> _logger;
 
         /// <summary>
